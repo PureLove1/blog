@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.blog.mapper.BlogMapper">
+
+    <resultMap id="BaseResultMap" type="com.blog.pojo.Blog">
+        <id property="id" column="id" jdbcType="BIGINT"/>
+        <result property="title" column="title" jdbcType="VARCHAR"/>
+        <result property="content" column="content" jdbcType="VARCHAR"/>
+        <result property="collection" column="is_collection" jdbcType="BOOLEAN"/>
+        <result property="description" column="description" jdbcType="VARCHAR"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="collectionName" column="collection_name" jdbcType="VARCHAR"/>
+        <result property="viewNum" column="view_num" jdbcType="INTEGER"/>
+        <result property="userName" column="user_name" jdbcType="VARCHAR"/>
+        <result property="userId" column="user_id" jdbcType="BIGINT"/>
+    </resultMap>
+
+    <resultMap id="TagResultMap" type="com.blog.pojo.Blog">
+        <id property="id" column="id" jdbcType="BIGINT"/>
+        <result property="title" column="title" jdbcType="VARCHAR"/>
+        <result property="collection" column="is_collection" jdbcType="BOOLEAN"/>
+        <result property="description" column="description" jdbcType="VARCHAR"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="collection" column="is_collection" jdbcType="BOOLEAN"/>
+        <result property="collectionName" column="collection_name" jdbcType="VARCHAR"/>
+        <result property="viewNum" column="view_num" jdbcType="INTEGER"/>
+        <result property="userName" column="user_name" jdbcType="VARCHAR"/>
+        <result property="userId" column="user_id" jdbcType="BIGINT"/>
+        <collection property="tags" column="id" ofType="com.blog.pojo.Tag" select="getTagsByBlogId">
+            <id property="id" column="tid" jdbcType="BIGINT"/>
+            <result property="content" column="tcontent" jdbcType="VARCHAR"/>
+        </collection>
+    </resultMap>
+    <select id="getTagsByBlogId" resultType="com.blog.pojo.Tag">
+        select t.id,t.content from tag t
+        inner join blog_tag bt
+        on bt.tag_id=t.id
+        where bt.blog_id = #{id}
+    </select>
+
+    <sql id="Base_Column_List">
+        id,title,
+        content,is_collection,description,
+        update_time,create_time,collection_name,
+        view_num,user_name,user_id
+    </sql>
+    <select id="getBlogList" resultMap="TagResultMap">
+        select b.id,b.title,b.description,b.create_time,b.is_collection,b.collection_name,
+        b.view_num,b.user_name,b.user_id
+        from blog b
+        where b.create_time <![CDATA[<=#{startTime}]]>
+        order by b.create_time desc
+        limit #{start},#{end}
+    </select>
+
+    <select id="getBlogListByIds" resultMap="TagResultMap">
+        select b.id,b.title,b.description,b.create_time,b.is_collection,b.collection_name,
+        b.view_num,b.user_name,b.user_id
+        from blog b
+        where  1=1
+        <if test="title!=null">
+            and b.title like concat(#{title},'%')
+        </if>
+        <if test="ids!=null and ids.size>0">
+            and b.id in
+        <foreach collection="ids" index="index" close=")" item="id" open="(" separator=",">
+            #{id}
+        </foreach>
+        </if>
+        order by create_time desc
+        <if test="start!=null and pageSize!=null">
+            limit #{start},#{pageSize}
+        </if>
+    </select>
+
+</mapper>
