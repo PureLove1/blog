@@ -66,7 +66,6 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog>
 	@Override
 	@Transactional(rollbackFor = Exception.class)
 	public Result addBlog(Blog blog) {
-		logger.info("参数{}", blog);
 		User currentUser = UserHolder.getCurrentUser();
 		if (currentUser == null) {
 			return Result.error("用户尚未登陆", StatusCode.USER_LOGIN_ERROR);

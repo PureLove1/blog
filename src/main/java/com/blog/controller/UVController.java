@@ -3,8 +3,11 @@ package com.blog.controller;
 import com.blog.common.Result;
 import com.blog.constant.StatusCode;
 import com.blog.service.UniqueVisitorService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,13 +28,15 @@ public class UVController {
 	@Autowired
 	private UniqueVisitorService uniqueVisitorService;
 
+	private static final Logger logger = LoggerFactory.getLogger(UVController.class);
+
 	/**
 	 * 单日uv统计
 	 * @param date
 	 * @return
 	 */
 	@GetMapping
-	public Result getDateUV(@Param("date") Date date) {
+	public Result getDateUV(@Param("date") @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss") Date date) {
 		if (date == null) {
 			return Result.error("必填参数不得为空", USER_REQUIRED_PARAMETER_IS_NULL_ERROR);
 		}

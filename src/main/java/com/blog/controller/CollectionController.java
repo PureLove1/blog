@@ -3,6 +3,8 @@ package com.blog.controller;
 import com.blog.annotation.HasAnyRole;
 import com.blog.common.Result;
 import com.blog.service.CollectionService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,6 +19,7 @@ import static com.blog.constant.UserRole.ROLE_VIP;
 @RestController
 @RequestMapping("/collection")
 public class CollectionController {
+	private static final Logger logger = LoggerFactory.getLogger(CollectionController.class);
 
 	@Autowired
 	private CollectionService collectionService;
