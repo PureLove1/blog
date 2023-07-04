@@ -140,10 +140,29 @@ public class LoginController {
 			}
 			//调用 send 方法
 			javaMailSender.send(helper.getMimeMessage());
+			if (!redisTemplate.opsForValue().setIfAbsent(to,codeString,5, TimeUnit.MINUTES)) {
+				try {
+					redisRetry(to,codeString,5,TimeUnit.MINUTES);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
 		};
 		MailSenderThreadPool.addSendMailTask(task);
 		return Result.ok("邮件发送成功，五分钟内有效");
 	}
+
+	private void redisRetry(String to, String codeString, int i, TimeUnit minutes) throws InterruptedException {
+		int x = 1;
+		while(x<3){
+			Thread.sleep(1000);
+			if (redisTemplate.opsForValue().setIfAbsent(to,codeString,5, TimeUnit.MINUTES)) {
+				return;
+			}
+			x++;
+		}
+	}
+
 
 	/**
 	 * 暂定重试机制
