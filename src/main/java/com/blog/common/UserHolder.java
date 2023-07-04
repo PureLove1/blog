@@ -19,6 +19,7 @@ public class UserHolder {
      * @param user
      */
     public static void setCurrentUser(User user) {
+
         threadLocal.set(user);
     }
 

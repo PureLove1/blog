@@ -16,11 +16,11 @@ import static com.blog.constant.StatusCode.*;
  * @date 2022/11/28
  */
 @Slf4j
-@RestControllerAdvice
-@ControllerAdvice(annotations = {Controller.class, RestController.class})
-@ResponseBody
+@RestControllerAdvice(annotations = {Controller.class, RestController.class})
 public class GlobalExceptionHandler {
+
     private Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
 
     /**
      * 用户未完成登录异常

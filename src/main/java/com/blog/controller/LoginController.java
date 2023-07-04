@@ -2,6 +2,7 @@ package com.blog.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.blog.common.JwtClaims;
+import com.blog.common.MailSenderThreadPool;
 import com.blog.common.Result;
 import com.blog.common.exception.CustomException;
 import com.blog.pojo.TokenVO;
@@ -30,6 +31,7 @@ import org.thymeleaf.context.Context;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
+import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -98,42 +100,87 @@ public class LoginController {
 		if (emailOwner == null) {
 			return Result.error("该邮件地址尚未被注册");
 		}
-		//构建 MimeMessage（邮件的主体） Spring 提供了 MimeMessageHelper 帮助类
-		String subject = "邮箱登陆验证码";
-		MimeMessage mimeMessage = javaMailSender.createMimeMessage();
-		MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
-		//生成随机数
-		int randomCode = (int) ((Math.random() * 9 + 1) * 100000);
-		String codeString = String.valueOf(randomCode);
-		Context context = new Context();
-
-		context.setVariable("username", emailOwner.getUserName());
-		context.setVariable("code", codeString);
-		context.setVariable("to", to);
-
-		logger.error("设置的验证码是" + codeString);
-		//随机数放入redis，并设置过期时间五分钟
-		String content = templateEngine.process("mailtemplate", context);
-		try {
-			helper.setFrom(from);
-			helper.setTo(to);
-			helper.setSubject(subject);
-			//设置邮件内容支持HTML文件格式
-			helper.setText(content, true);
-		} catch (MessagingException e) {
-			logger.error("发送邮件失败：" + e.getMessage());
-			return Result.error("邮件发送失败");
+		Object o = redisTemplate.opsForValue().get(to);
+		if (o != null) {
+			return Result.error("验证码尚未过期，请查看您的邮箱");
 		}
-		if (!redisTemplate.opsForValue().setIfAbsent(to, codeString, 5L, TimeUnit.MINUTES)) {
-			return Result.error("验证码尚未过期，请稍候再试");
-		}
-		//调用 send 方法
-		javaMailSender.send(helper.getMimeMessage());
+		Runnable task = () -> {
+			//构建 MimeMessage（邮件的主体） Spring 提供了 MimeMessageHelper 帮助类
+			String subject = "邮箱登陆验证码";
+			MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+			MimeMessageHelper helper = null;
+			try {
+				helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+			} catch (MessagingException e) {
+				e.printStackTrace();
+			}
+			//生成随机数
+			int randomCode = (int) ((Math.random() * 9 + 1) * 100000);
+			String codeString = String.valueOf(randomCode);
+			Context context = new Context();
+			context.setVariable("username", emailOwner.getUserName());
+			context.setVariable("code", codeString);
+			context.setVariable("to", to);
+			logger.error("设置的验证码是" + codeString);
+			//随机数放入redis，并设置过期时间五分钟
+			String content = templateEngine.process("mailtemplate", context);
+			try {
+				helper.setFrom(from);
+				helper.setTo(to);
+				helper.setSubject(subject);
+				//设置邮件内容支持HTML文件格式
+				helper.setText(content, true);
+			} catch (MessagingException e) {
+				try {
+					retry(javaMailSender, helper, from, to, subject, content);
+					return;
+				} catch (InterruptedException ex) {
+					ex.printStackTrace();
+				}
+			}
+			//调用 send 方法
+			javaMailSender.send(helper.getMimeMessage());
+		};
+		MailSenderThreadPool.addSendMailTask(task);
 		return Result.ok("邮件发送成功，五分钟内有效");
 	}
 
+	/**
+	 * 暂定重试机制
+	 * @param sender
+	 * @param helper
+	 * @param from
+	 * @param to
+	 * @param subject
+	 * @param content
+	 * @throws InterruptedException
+	 */
+	void retry(JavaMailSender sender, MimeMessageHelper helper, String from, String to, String subject, String content) throws InterruptedException {
+		int maxRetryTimes = 3;
+		int i = 1;
+		logger.info("重试调用");
+		while (i <= maxRetryTimes) {
+			try {
+				helper.setFrom(from);
+				helper.setTo(to);
+				helper.setSubject(subject);
+				//设置邮件内容支持HTML文件格式
+				helper.setText(content, true);
+				sender.send(helper.getMimeMessage());
+				return;
+			} catch (MessagingException e) {
+				if (i == maxRetryTimes) {
+					logger.error("邮件发送失败，时间：{}，参数=发送人：{}，接收人：{}，主题：{}，内容：{}，异常堆栈：{}",
+							new Date(),from,to,subject,content,e.getStackTrace());
+				}
+				i++;
+				Thread.sleep(1000);
+			}
+		}
+	}
+
 	@Async
-	public void delete(String key) {
+	public void delete(String key){
 		System.out.println("删除方法被调用");
 		while (!redisTemplate.delete(key)) {
 			if (redisTemplate.opsForValue().get(key) != null) {
