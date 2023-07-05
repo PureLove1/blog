@@ -15,8 +15,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class JwtClaims {
 	/**
-	 * 用户id 由于jwt是无状态的，所以只能存id
-	 */
+	 * 用户id 由于jwt是无状态的，所以只能存id等不变的数据
+	 **/
 	private long id;
 
 	public JwtClaims(User user){

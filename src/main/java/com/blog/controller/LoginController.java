@@ -96,7 +96,9 @@ public class LoginController {
 		HttpServletRequest req = (HttpServletRequest) servletRequest;
 		String to = req.getParameter("to");
 		logger.info("发送邮件至{}", to);
-		User emailOwner = userService.getOne(new LambdaQueryWrapper<User>().eq(User::getEmail, to));
+		User emailOwner = userService.getOne(
+				new LambdaQueryWrapper<User>().eq(User::getEmail, to)
+				.select(User::getUserName));
 		if (emailOwner == null) {
 			return Result.error("该邮件地址尚未被注册");
 		}
@@ -121,7 +123,7 @@ public class LoginController {
 			context.setVariable("username", emailOwner.getUserName());
 			context.setVariable("code", codeString);
 			context.setVariable("to", to);
-			logger.error("设置的验证码是" + codeString);
+			logger.info("设置的验证码是" + codeString);
 			//随机数放入redis，并设置过期时间五分钟
 			String content = templateEngine.process("mailtemplate", context);
 			try {
@@ -140,9 +142,9 @@ public class LoginController {
 			}
 			//调用 send 方法
 			javaMailSender.send(helper.getMimeMessage());
-			if (!redisTemplate.opsForValue().setIfAbsent(to,codeString,5, TimeUnit.MINUTES)) {
+			if (!redisTemplate.opsForValue().setIfAbsent(to, codeString, 5, TimeUnit.MINUTES)) {
 				try {
-					redisRetry(to,codeString,5,TimeUnit.MINUTES);
+					redisRetry(to, codeString, 5, TimeUnit.MINUTES);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
@@ -154,9 +156,9 @@ public class LoginController {
 
 	private void redisRetry(String to, String codeString, int i, TimeUnit minutes) throws InterruptedException {
 		int x = 1;
-		while(x<3){
+		while (x < 3) {
 			Thread.sleep(1000);
-			if (redisTemplate.opsForValue().setIfAbsent(to,codeString,5, TimeUnit.MINUTES)) {
+			if (redisTemplate.opsForValue().setIfAbsent(to, codeString, 5, TimeUnit.MINUTES)) {
 				return;
 			}
 			x++;
@@ -166,6 +168,7 @@ public class LoginController {
 
 	/**
 	 * 暂定重试机制
+	 *
 	 * @param sender
 	 * @param helper
 	 * @param from
@@ -174,7 +177,9 @@ public class LoginController {
 	 * @param content
 	 * @throws InterruptedException
 	 */
-	void retry(JavaMailSender sender, MimeMessageHelper helper, String from, String to, String subject, String content) throws InterruptedException {
+	void retry(JavaMailSender sender, MimeMessageHelper helper, String from, String to,
+	           String subject, String content)
+			throws InterruptedException {
 		int maxRetryTimes = 3;
 		int i = 1;
 		logger.info("重试调用");
@@ -190,7 +195,7 @@ public class LoginController {
 			} catch (MessagingException e) {
 				if (i == maxRetryTimes) {
 					logger.error("邮件发送失败，时间：{}，参数=发送人：{}，接收人：{}，主题：{}，内容：{}，异常堆栈：{}",
-							new Date(),from,to,subject,content,e.getStackTrace());
+							new Date(), from, to, subject, content, e.getStackTrace());
 				}
 				i++;
 				Thread.sleep(1000);
@@ -198,20 +203,22 @@ public class LoginController {
 		}
 	}
 
+	/**
+	 * 删除 Redis指定Key
+	 * @param key
+	 */
 	@Async
-	public void delete(String key){
-		System.out.println("删除方法被调用");
+	public void delete(String key) {
+		int maxRetry = 3;
 		while (!redisTemplate.delete(key)) {
-			if (redisTemplate.opsForValue().get(key) != null) {
-				System.out.println("继续删除");
+			if (maxRetry > 0) {
+				maxRetry--;
 				continue;
 			} else {
-				System.out.println("已经删除");
-				return;
+				logger.error("删除Redis：key{}超出重试次数", key);
 			}
 		}
-		;
-		System.out.println("删除成功");
+		logger.info("删除Redis：key{}成功", key);
 	}
 
 }
