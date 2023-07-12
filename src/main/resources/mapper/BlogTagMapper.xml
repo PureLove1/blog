@@ -5,15 +5,23 @@
 <mapper namespace="com.blog.mapper.BlogTagMapper">
 
     <resultMap id="BaseResultMap" type="com.blog.pojo.BlogTag">
-            <id property="id" column="id" jdbcType="BIGINT"/>
-            <result property="tagId" column="tag_id" jdbcType="BIGINT"/>
-            <result property="blogId" column="blog_id" jdbcType="BIGINT"/>
-            <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
-            <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+        <id property="id" column="id" jdbcType="BIGINT"/>
+        <result property="tagId" column="tag_id" jdbcType="BIGINT"/>
+        <result property="blogId" column="blog_id" jdbcType="BIGINT"/>
+        <result property="deleted" column="is_deleted" jdbcType="BOOLEAN"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
     </resultMap>
 
+    <update id="customDelete">
+        update blog_tag
+        set is_deleted = #{deleted}
+        where blog_id = #{blogId}
+        and tag_id = #{tagId}
+    </update>
+
     <sql id="Base_Column_List">
-        id,tag_id,blog_id,
+        id,tag_id,blog_id,is_deleted
         create_time,update_time
     </sql>
 </mapper>

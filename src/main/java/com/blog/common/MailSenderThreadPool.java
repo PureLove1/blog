@@ -2,6 +2,7 @@ package com.blog.common;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Bean;
 
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.SynchronousQueue;
@@ -13,7 +14,9 @@ import java.util.concurrent.TimeUnit;
  * @Date 2023/7/4
  */
 public class MailSenderThreadPool {
+
 	private static final Logger logger = LoggerFactory.getLogger(MailSenderThreadPool.class);
+
 	private static ThreadPoolExecutor mailSenderExecutor;
 
 	static {

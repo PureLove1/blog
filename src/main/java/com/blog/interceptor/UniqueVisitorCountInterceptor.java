@@ -28,22 +28,15 @@ public class UniqueVisitorCountInterceptor implements HandlerInterceptor {
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 		//获取远程IP
 		String remoteAddr = getRemoteAddr(request);
-		//远程用户
-		String remoteUser = request.getRemoteUser();
-		//远程端口
-		int remotePort = request.getRemotePort();
-		//远程主机
-		String remoteHost = request.getRemoteHost();
-		//使用协议
-		String protocol = request.getProtocol();
-		//用户代理
-		String userAgent = request.getHeader("User-Agent");
-		logger.info("访问IP端口：{}:{}；远程用户名：{},远程主机名：{},使用协议：{},用户代理：{}，访问时间：{}",
-				remoteAddr,remotePort,remoteUser,remoteHost,protocol,userAgent,new Date());
 		uniqueVisitorService.addVisitRecord(remoteAddr);
 		return true;
 	}
 
+	/**
+	 * 获取远程真实IP地址
+	 * @param request
+	 * @return
+	 */
 	private String getRemoteAddr(HttpServletRequest request) {
 		String ip = request.getHeader("X-Forwarded-For");
 		if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {

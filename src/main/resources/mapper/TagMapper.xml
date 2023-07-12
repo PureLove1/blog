@@ -11,6 +11,16 @@
             <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
     </resultMap>
 
+    <select id="getTagByBlogId" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"></include>
+        from tag
+        where id in (
+        select tag_id from blog_tag
+        where blog_id = #{blogId}
+        and is_deleted=0
+        )
+    </select>
+
     <sql id="Base_Column_List">
         id,content,update_time,
         create_time

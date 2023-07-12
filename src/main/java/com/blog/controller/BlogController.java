@@ -27,8 +27,12 @@ import static java.lang.Boolean.TRUE;
 @RestController
 @RequestMapping("/blog")
 public class BlogController {
+
 	@Autowired
 	private BlogService blogService;
+
+	private static final Integer WITH_ID = 1;
+	private static final Integer WITHOUT_ID = null;
 
 	private static final Logger logger = LoggerFactory.getLogger(BlogController.class);
 
@@ -41,12 +45,26 @@ public class BlogController {
 	@PostMapping
 	@HasAnyRole(ROLE_VIP)
 	public Result addBlog(@RequestBody Blog blog) {
-		logger.warn("添加博客，参数：{}", blog);
-		if (isNotNull(blog)) {
+		if (isNotNull(blog,  WITHOUT_ID)) {
 			return blogService.addBlog(blog);
 		} else {
 			return Result.error("必填数据不得为空");
 		}
+	}
+
+	/**
+	 * 修改博客内容
+	 *
+	 * @param blog
+	 * @return
+	 */
+	@PutMapping
+	@HasAnyRole(ROLE_VIP)
+	public Result updateBlog(@RequestBody Blog blog) {
+		if (!isNotNull(blog,WITH_ID)) {
+			return Result.error("参数错误，必填参数不得为空");
+		}
+		return blogService.updateBlog(blog);
 	}
 
 	/**
@@ -62,7 +80,6 @@ public class BlogController {
 	                          @Param("currentPage") Long currentPage,
 	                          @Param("startTime") String startTime) {
 		LocalDateTime parse = LocalDateTime.parse(startTime, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-		logger.warn("博客列表数据分页，参数：页大小{}，当前页{}，开始时间{}", pageSize, currentPage, startTime);
 		if (pageSize == null || pageSize < 1 || currentPage == null || currentPage < 1 || startTime == null) {
 			return Result.error("错误的分页参数");
 		}
@@ -73,13 +90,11 @@ public class BlogController {
 	 * 根据id查询博文
 	 *
 	 * @param id
-	 * @param request
 	 * @return
 	 */
 	@GetMapping("/{id}")
-	public Result getBlogById(@PathVariable String id, HttpServletRequest request) {
-		logger.warn("根据id查询博文，参数：id{}", id);
-		if(id==null){
+	public Result getBlogById(@PathVariable String id) {
+		if (id == null) {
 			return Result.error("错误的参数");
 		}
 		try {
@@ -89,18 +104,16 @@ public class BlogController {
 			}
 			return blogService.getBlogById(l);
 		} catch (NumberFormatException e) {
-			logger.warn("{}", e);
 			return Result.error("错误的参数");
 		}
 	}
 
 	/**
 	 * 用于判断博文对象是否为null
-	 *
 	 * @param blog
 	 * @return
 	 */
-	private boolean isNotNull(Blog blog) {
+	private boolean isNotNull(Blog blog, Integer mode) {
 		if (blog == null) {
 			return false;
 		}
@@ -109,7 +122,10 @@ public class BlogController {
 				return false;
 			}
 		}
-		return blog.getTags() != null && blog.getContent() != null && blog.getTitle() != null;
+		if (mode == null) {
+			return blog.getTags() != null && blog.getContent() != null && blog.getTitle() != null;
+		}
+		return blog.getTags() != null && blog.getContent() != null && blog.getTitle() != null && blog.getId() != null;
 	}
 
 	/**
@@ -121,9 +137,8 @@ public class BlogController {
 	 * @return
 	 */
 	@GetMapping("/tag")
-	private Result getBlogByTag(@Param("tag") String tag, @Param("pageSize") Integer pageSize,
-	                            @Param("currentPage") Integer currentPage) {
-		logger.warn("根据标签查询博客，参数：标签{}，页大小{}，当前页{}", tag, pageSize, currentPage);
+	public Result getBlogByTag(@Param("tag") String tag, @Param("pageSize") Integer pageSize,
+	                           @Param("currentPage") Integer currentPage) {
 		if (!StringUtil.isNotBlank(tag)) {
 			return Result.error("错误的参数");
 		}
@@ -142,9 +157,8 @@ public class BlogController {
 	 * @return
 	 */
 	@GetMapping("/title")
-	private Result getBlogByTitle(@Param("title") String title, @Param("pageSize") Integer pageSize,
-	                              @Param("currentPage") Integer currentPage) {
-		logger.warn("根据标题查询博客，参数：标题{}，页大小{}，当前页{}", title, pageSize, currentPage);
+	public Result getBlogByTitle(@Param("title") String title, @Param("pageSize") Integer pageSize,
+	                             @Param("currentPage") Integer currentPage) {
 		if (!StringUtil.isNotBlank(title)) {
 			return Result.error("错误的参数");
 		}
@@ -161,8 +175,7 @@ public class BlogController {
 	 * @return
 	 */
 	@GetMapping("/newest")
-	private Result getNewestTitle(@Param("pageSize") Integer pageSize) {
-		logger.warn("查询最新文章标题，参数：页大小{}", pageSize);
+	public Result getNewestTitle(@Param("pageSize") Integer pageSize) {
 		if (pageSize > 100 || pageSize < 1) {
 			return Result.error("错误的展现数量");
 		}
@@ -173,7 +186,6 @@ public class BlogController {
 	@GetMapping("/collection")
 	public Result getBlogListByCollection(@Param("blogId") Long blogId, @Param("pageSize") Integer pageSize,
 	                                      @Param("currentPage") Integer currentPage) {
-		logger.warn("根据合集查询博客，参数：博客编号{}，页大小{}，当前页{}", blogId, pageSize, currentPage);
 		if (pageSize == null || pageSize < 1 || currentPage == null || currentPage < 1) {
 			return Result.error("错误的分页参数");
 		}

@@ -24,4 +24,6 @@ public interface BlogService extends IService<Blog> {
 	Result getBlogListByCollection(Long blogId,Integer pageSize,Integer currentPage);
 
 	Result getBlogByTitle(String title, Integer pageSize, Integer currentPage);
+
+	Result updateBlog(Blog blog);
 }

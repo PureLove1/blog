@@ -21,9 +21,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.thymeleaf.TemplateEngine;
@@ -72,7 +70,6 @@ public class LoginController {
 			if (one == null) {
 				return Result.error("用户不存在");
 			}
-			System.out.println(storeCode);
 			if (storeCode.equals(code)) {
 				String token = JwtTokenUtil.createJwt(new JwtClaims(one));
 				String refreshToken = JwtTokenUtil.createRefreshToken(new JwtClaims(one));

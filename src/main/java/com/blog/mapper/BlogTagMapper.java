@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface BlogTagMapper extends BaseMapper<BlogTag> {
-
+	int customDelete(Boolean deleted, Long blogId, Long tagId);
 }
 
 

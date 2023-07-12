@@ -24,7 +24,8 @@ public class PasswordUtil {
 	 * @param encodedPassword
 	 * @return
 	 */
-	public static boolean validatePassword(String password, String salt, String encodedPassword) throws NoSuchAlgorithmException {
+	public static boolean validatePassword(String password, String salt, String encodedPassword)
+			throws NoSuchAlgorithmException {
 		logger.info(password);
 		logger.info(salt);
 		byte[] bytes = (password + salt).getBytes(UTF_8);
@@ -42,7 +43,7 @@ public class PasswordUtil {
 	 * @param salt
 	 * @return
 	 */
-	public static String encodePassword(String password, String salt) throws NoSuchAlgorithmException {
+	private static String encodePassword(String password, String salt) throws NoSuchAlgorithmException {
 		MessageDigest sha = MessageDigest.getInstance("SHA");
 		String info = password + salt;
 		byte[] srcBytes = info.getBytes(UTF_8);
@@ -60,11 +61,5 @@ public class PasswordUtil {
 	 */
 	public static String getSalt() {
 		return RandomStringUtils.random(5);
-	}
-
-
-	public static void main(String[] args) throws NoSuchAlgorithmException {
-		String aywbs = encodePassword("123456", "aywbs");
-		System.out.println(aywbs);
 	}
 }

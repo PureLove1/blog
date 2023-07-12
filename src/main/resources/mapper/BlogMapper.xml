@@ -38,7 +38,7 @@
         select t.id,t.content from tag t
         inner join blog_tag bt
         on bt.tag_id=t.id
-        where bt.blog_id = #{id}
+        where bt.blog_id = #{id} and bt.is_deleted=0
     </select>
 
     <sql id="Base_Column_List">

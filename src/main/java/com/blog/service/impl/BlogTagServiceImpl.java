@@ -13,6 +13,10 @@ import org.springframework.stereotype.Service;
 public class BlogTagServiceImpl extends ServiceImpl<BlogTagMapper, BlogTag>
     implements BlogTagService{
 
+	@Override
+	public int customDelete(Boolean deleted, Long blogId, Long tagId) {
+		return 0;
+	}
 }
 
 

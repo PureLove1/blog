@@ -42,6 +42,9 @@ public class BlogTag implements Serializable {
     @TableField(fill= FieldFill.INSERT_UPDATE)
     private LocalDateTime updateTime;
 
+    @TableField("is_deleted")
+    private Boolean deleted;
+
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
 }

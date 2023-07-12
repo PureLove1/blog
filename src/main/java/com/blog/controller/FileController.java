@@ -32,7 +32,6 @@ import static com.blog.constant.UserRole.ROLE_VIP;
 // 域名不同 也是跨域  http://www.jd.com  ---> http://www.taobao.com
 // 协议一直,端口一致,域名一致就不是跨域
 // http://www.jd.com:80 --->http://www.jd.com:80 不是跨域
-@Slf4j
 @RequestMapping("/file")
 @RestController
 //@CrossOrigin//支持跨域
@@ -65,7 +64,7 @@ public class FileController {
             //获取文件扩展名
             String filenameExtension = StringUtils.getFilenameExtension(file.getOriginalFilename());
             if (!filenameExtensions.contains(filenameExtension)){
-                log.error("上传的文件类型错误{}",filenameExtension);
+                logger.error("上传的文件类型错误{}",filenameExtension);
                 return Result.error("不支持的文件类型",USER_UPLOAD_FILE_TYPE_UNMATCHED_ERROR);
             }
             logger.info("上传文件："+file.getOriginalFilename());
@@ -81,12 +80,12 @@ public class FileController {
             //2. 调用工具类实现图片上传
             String[] upload = FastDfsClient.upload(fastdfsfile);
             //3. 拼接图片的全路径返回
-            log.info("文件上传成功，返回图片请求地址"+FastDfsClient.getTrackerUrl()+"/"+upload[0]+"/"+upload[1]);
+            logger.info("文件上传成功，返回图片请求地址"+FastDfsClient.getTrackerUrl()+"/"+upload[0]+"/"+upload[1]);
             return Result.ok(FastDfsClient.getTrackerUrl()+"/"+upload[0]+"/"+upload[1]);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        log.error(LocalDateTime.now() + "上传文件过程中出错");
+        logger.error(LocalDateTime.now() + "上传文件过程中出错");
         return Result.error("文件上传过程中出错！",SYSTEM_EXECUTION_ERROR);
     }
 
