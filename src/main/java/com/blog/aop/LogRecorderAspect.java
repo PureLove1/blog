@@ -43,14 +43,17 @@ public class LogRecorderAspect {
 
 	/**
 	 * 记录用户service访问信息
+	 *
 	 * @param joinPoint
 	 */
 	@Before("servicePointcut()")
 	public void beforeServiceExecute(JoinPoint joinPoint) {
 		recordUserAccess(joinPoint);
 	}
+
 	/**
 	 * 记录用户controller访问信息
+	 *
 	 * @param joinPoint
 	 */
 	@Before("controllerPointcut()")
@@ -58,9 +61,17 @@ public class LogRecorderAspect {
 		recordUserAccess(joinPoint);
 	}
 
+	/**
+	 * 记录用户操作
+	 * @param joinPoint
+	 */
 	private void recordUserAccess(JoinPoint joinPoint) {
 		ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+		if (attributes == null) {
+			return;
+		}
 		HttpServletRequest request = attributes.getRequest();
+
 		//获取IP
 		String ip = request.getRemoteHost();
 		//获取当前时间
@@ -74,6 +85,6 @@ public class LogRecorderAspect {
 		String method = signature.getName();
 		//获取参数
 		Object[] args = joinPoint.getArgs();
-		logger.info("用户IP：{}于{}访问了{}类的{}方法，参数列表为：{}",ip,time,typeName,method,args);
+		logger.info("用户IP：{}于{}访问了{}类的{}方法，参数列表为：{}", ip, time, typeName, method, args);
 	}
 }

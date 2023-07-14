@@ -1,8 +1,9 @@
 server:
-  port: 8081
   servlet:
     context-path: /
 spring:
+  profiles:
+    active: pro
   servlet:
     multipart: #设置文件上传大小限制
       max-file-size: 500MB
@@ -19,17 +20,6 @@ spring:
     protocol: smtps
     # 其他配置 Map数据类型  采用ssl安全连接的方式
     properties: {mail.smtp.ssl.enable: true}
-  datasource:
-    driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://${mysql.host}:3306/blog?useSSL=false&characterEncoding=utf8
-    password: ${mysql.password}
-    username: ${mysql.username}
-    type: com.alibaba.druid.pool.DruidDataSource
-    druid:
-      initial-size: 3 #核心数*2+磁盘数
-      max-active: 20
-      max-wait: 9000
-      min-idle: 2
   redis:
     password: ${cloud.redis.password}
     host: ${cloud.redis.host}
@@ -45,3 +35,68 @@ mybatis-plus:
     map-underscore-to-camel-case: true #驼峰命名转换，如果没有使用@TableField就必须开启，否则可能导致
   mapper-locations: classpath:mapper/*.xml #xml mapper路径
   type-aliases-package: com.blog.pojo #别名包扫描
+
+---
+
+##生产环境
+spring:
+  profiles: pro
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://${mysql.host}:3306/blog?useSSL=false&characterEncoding=utf8&serverTimezone=GMT%2B8
+    password: ${mysql.password}
+    username: ${mysql.username}
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      initial-size: 3 #核心数*2+磁盘数
+      max-active: 20
+      max-wait: 9000
+      min-idle: 2
+server:
+  port: 81
+
+#生产环境无日志
+---
+
+##开发环境
+spring:
+  profiles: dev
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/blog?useSSL=false&characterEncoding=utf8&serverTimezone=GMT%2B8
+    password: 123456
+    username: root
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      initial-size: 10 #核心数*2+磁盘数
+      max-active: 20
+      max-wait: 9000
+      min-idle: 10
+server:
+  port: 81
+mybatis-plus:
+  #检查配置文件位置
+  configuration:
+  log-impl: org.apache.ibatis.logging.stdout.StdOutImpl #日志输出路径：控制台
+---
+
+##测试环境
+spring:
+  profiles: test
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/blog?useSSL=false&characterEncoding=utf8&serverTimezone=GMT%2B8
+    password: 123456
+    username: root
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      initial-size: 10 #核心数*2+磁盘数
+      max-active: 20
+      max-wait: 9000
+      min-idle: 10
+server:
+  port: 8082
+mybatis-plus:
+  #检查配置文件位置
+  configuration:
+  log-impl: org.apache.ibatis.logging.stdout.StdOutImpl #日志输出路径：控制台

@@ -45,9 +45,39 @@
             <charset>utf-8</charset>
         </encoder>
     </appender>
+    <!-- 异常日志存储 -->
+    <appender name="FILE_ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!--当天日志名称-->
+        <file>${LOG_PATH}/${APP_DIR}/logs/error/${APP_NAME}-error.log</file>
+        <!--日志滚动添加政策-->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/${APP_DIR}/logs/error/${APP_NAME}-error.log.%d{yyyy-MM-dd}-%i</fileNamePattern>
+            <!--基于时间的文件命名和触发政策-->
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>10MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <append>true</append>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %level [%thread] %logger{10} [%file:%line] %msg%n</pattern>
+            <charset>utf-8</charset>
+        </encoder>
+    </appender>
 
+    <!--DEBUG级别日志太低了，东西很杂-->
+<!--    <root level="DEBUG">-->
+<!--        <appender-ref ref="STDOUT"/>-->
+<!--    </root>-->
     <root level="INFO">
-        <appender-ref ref="FILE_INFO"/>
         <appender-ref ref="STDOUT"/>
+        <appender-ref ref="FILE_INFO"/>
     </root>
+    <root level="ERROR">
+        <appender-ref ref="FILE_ERROR"/>
+    </root>
+<!--    <root level="ERROR">-->
+<!--        <appender-ref ref="FILE_INFO"/>-->
+<!--        <appender-ref ref="STDOUT"/>-->
+<!--    </root>-->
 </configuration>

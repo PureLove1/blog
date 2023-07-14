@@ -11,6 +11,8 @@ import java.time.LocalDateTime;
  */
 public interface BlogService extends IService<Blog> {
 
+	void updateViewNum(Long id);
+
 	Result addBlog(Blog blog);
 
 	Result getBlogList(Long currentPage, Long pageSize, LocalDateTime startTime);

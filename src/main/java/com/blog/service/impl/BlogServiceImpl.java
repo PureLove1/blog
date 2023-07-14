@@ -15,6 +15,7 @@ import com.blog.service.BlogService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -42,6 +43,13 @@ import static com.blog.constant.RedisKeyPrefix.BLOG_CACHE;
 public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog>
 		implements BlogService {
 	private static final Logger logger = LoggerFactory.getLogger(BlogServiceImpl.class);
+
+	/**
+	 * @Lazy 解决循环依赖
+	 */
+	@Autowired
+	@Lazy
+	private BlogService  blogService;
 
 	@Autowired
 	private CollectionMapper collectionMapper;
@@ -180,7 +188,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog>
 		if (o != null) {
 			Blog cachedBlog = (Blog) o;
 			//添加访问数
-			updateViewNum(id);
+			blogService.updateViewNum(id);
 			return Result.ok(cachedBlog);
 		}
 		//缓存未命中，查询数据库并添加缓存
@@ -191,7 +199,8 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog>
 		List<Tag> tags = tagMapper.getTagByBlogId(id);
 		byId.setTags(tags);
 		redisTemplate.opsForValue().set(BLOG_CACHE + id, byId, 30, TimeUnit.MINUTES);
-		updateViewNum(id);
+		//如果异步方法和调用方法在同一个类中，需要通过注入自己才能使用SpringBoot默认的线程池
+		blogService.updateViewNum(id);
 		return Result.ok(byId);
 	}
 
@@ -541,14 +550,16 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog>
 
 	/**
 	 * 异步修改浏览量
-	 *
 	 * @param id
 	 */
+	@Override
 	@Async
 	public void updateViewNum(Long id) {
 		int maxRetry = 3;
 		int i = 0;
 		while (i < maxRetry) {
+			System.out.println(Thread.currentThread().getName());
+			i++;
 			threadSleep(1);
 			UpdateWrapper<Blog> wrapper = new UpdateWrapper<Blog>()
 					.eq("id", id).setSql("view_num = view_num+1");
@@ -556,7 +567,6 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog>
 			if (update == 1) {
 				return;
 			}
-
 		}
 		logger.error("更新博客浏览量超出最大此时次数后失败，博客id：{}", id);
 	}
