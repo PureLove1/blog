@@ -9,6 +9,7 @@ import java.util.List;
 
 /**
  * @Entity com.blog.pojo.Blog
+ * @author
  */
 @Repository
 public interface BlogMapper extends BaseMapper<Blog> {

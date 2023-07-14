@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 /**
  *
+ * @author 贺畅
  */
 @Service
 public class BlogCollectionServiceImpl extends ServiceImpl<BlogCollectionMapper, BlogCollection>

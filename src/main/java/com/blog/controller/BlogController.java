@@ -11,14 +11,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 import static com.blog.constant.StatusCode.USER_REQUIRED_PARAMETER_IS_NULL_ERROR;
 import static com.blog.constant.UserRole.ROLE_VIP;
 import static com.blog.util.StringUtil.isNotBlank;
-import static java.lang.Boolean.TRUE;
 
 /**
  * @author 贺畅

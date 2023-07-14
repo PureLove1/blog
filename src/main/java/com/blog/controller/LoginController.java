@@ -17,6 +17,7 @@ import javax.mail.internet.MimeMessage;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -41,7 +42,12 @@ import java.util.concurrent.TimeUnit;
 public class LoginController {
 
 	@Autowired
+	@Lazy
+	private LoginController loginController;
+
+	@Autowired
 	private UserService userService;
+
 	@Autowired
 	private JavaMailSender javaMailSender;
 
@@ -53,6 +59,11 @@ public class LoginController {
 
 	@Value("${spring.mail.username}")
 	private String from;
+
+	/**
+	 * 邮件过期时间
+	 */
+	private static final int EMAIL_EXPIRE_TIME = 5;
 
 	private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
 
@@ -74,7 +85,7 @@ public class LoginController {
 				String token = JwtTokenUtil.createJwt(new JwtClaims(one));
 				String refreshToken = JwtTokenUtil.createRefreshToken(new JwtClaims(one));
 				TokenVO tokenVO = new TokenVO(one, token, refreshToken);
-				delete(email);
+				loginController.delete(email);
 				return Result.ok("登陆成功，正在跳转", tokenVO);
 			}
 			return Result.error("验证码错误或已失效");
@@ -131,7 +142,7 @@ public class LoginController {
 				helper.setText(content, true);
 			} catch (MessagingException e) {
 				try {
-					retry(javaMailSender, helper, from, to, subject, content);
+					loginController.retry(javaMailSender, helper, from, to, subject, content);
 					return;
 				} catch (InterruptedException ex) {
 					ex.printStackTrace();
@@ -139,9 +150,9 @@ public class LoginController {
 			}
 			//调用 send 方法
 			javaMailSender.send(helper.getMimeMessage());
-			if (!redisTemplate.opsForValue().setIfAbsent(to, codeString, 5, TimeUnit.MINUTES)) {
+			if (!redisTemplate.opsForValue().setIfAbsent(to, codeString, EMAIL_EXPIRE_TIME, TimeUnit.MINUTES)) {
 				try {
-					redisRetry(to, codeString, 5, TimeUnit.MINUTES);
+					redisRetry(to, codeString, EMAIL_EXPIRE_TIME, TimeUnit.MINUTES);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
@@ -155,7 +166,7 @@ public class LoginController {
 		int x = 1;
 		while (x < 3) {
 			Thread.sleep(1000);
-			if (redisTemplate.opsForValue().setIfAbsent(to, codeString, 5, TimeUnit.MINUTES)) {
+			if (redisTemplate.opsForValue().setIfAbsent(to, codeString, i, TimeUnit.MINUTES)) {
 				return;
 			}
 			x++;
@@ -174,12 +185,12 @@ public class LoginController {
 	 * @param content
 	 * @throws InterruptedException
 	 */
+	@Async
 	void retry(JavaMailSender sender, MimeMessageHelper helper, String from, String to,
 	           String subject, String content)
 			throws InterruptedException {
 		int maxRetryTimes = 3;
 		int i = 1;
-		logger.info("重试调用");
 		while (i <= maxRetryTimes) {
 			try {
 				helper.setFrom(from);
@@ -205,7 +216,7 @@ public class LoginController {
 	 * @param key
 	 */
 	@Async
-	public void delete(String key) {
+	void delete(String key) {
 		int maxRetry = 3;
 		while (!redisTemplate.delete(key)) {
 			if (maxRetry > 0) {

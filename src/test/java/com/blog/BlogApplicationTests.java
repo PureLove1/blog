@@ -5,8 +5,6 @@ import com.blog.pojo.Blog;
 import com.blog.pojo.User;
 import com.blog.service.BlogService;
 import com.blog.service.UserService;
-import com.blog.util.RandomCodeUtil;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;

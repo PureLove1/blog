@@ -21,7 +21,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.HashSet;
 
 import static com.blog.constant.UserRole.ROLE_TOURIST;
-import static com.blog.util.StringUtil.*;
 import static com.blog.util.StringUtil.isNotBlank;
 
 /**
