@@ -3,6 +3,7 @@ package com.blog.controller;
 import com.blog.annotation.HasAnyRole;
 import com.blog.common.Result;
 import com.blog.service.CollectionService;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +18,7 @@ import static com.blog.constant.UserRole.ROLE_VIP;
  * @Author PureLove1
  * @Date 2023/6/23
  */
+@Api("合集管理")
 @RestController
 @RequestMapping("/collection")
 public class CollectionController {

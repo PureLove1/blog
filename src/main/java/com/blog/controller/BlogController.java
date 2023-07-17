@@ -5,6 +5,7 @@ import com.blog.common.Result;
 import com.blog.pojo.Blog;
 import com.blog.service.BlogService;
 import com.blog.util.StringUtil;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.ibatis.annotations.Param;
 import org.slf4j.Logger;
@@ -23,6 +24,7 @@ import static com.blog.util.StringUtil.isNotBlank;
  * @author 贺畅
  * @date 2023/6/21
  */
+@Api("博文管理")
 @RestController
 @RequestMapping("/blog")
 public class BlogController {

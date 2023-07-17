@@ -9,6 +9,7 @@ import com.blog.pojo.TokenVO;
 import com.blog.pojo.User;
 import com.blog.service.UserService;
 import com.blog.util.JwtTokenUtil;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +39,7 @@ import java.util.concurrent.TimeUnit;
  * @author 贺畅
  * @date 2023/6/22
  */
+@Api("登录管理")
 @RequestMapping("/login")
 @RestController
 public class LoginController {

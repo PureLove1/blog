@@ -6,6 +6,7 @@ import com.blog.common.UserHolder;
 import com.blog.pojo.FastDFSFile;
 import com.blog.pojo.User;
 import com.blog.util.FastDfsClient;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
@@ -35,6 +36,7 @@ import static com.blog.constant.UserRole.ROLE_VIP;
 // http://www.jd.com:80 --->http://www.jd.com:80 不是跨域
 @RequestMapping("/file")
 @RestController
+@Api("文件管理")
 //@CrossOrigin//支持跨域
 public class FileController {
     /**

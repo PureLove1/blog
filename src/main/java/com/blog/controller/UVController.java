@@ -3,6 +3,7 @@ package com.blog.controller;
 import com.blog.common.Result;
 import com.blog.constant.StatusCode;
 import com.blog.service.UniqueVisitorService;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +23,7 @@ import static com.blog.constant.StatusCode.USER_WRONG_PARAMETER_ERROR;
  * @Author PureLove1
  * @Date 2023/6/26
  */
+@Api("UV统计")
 @RestController
 @RequestMapping("/uv")
 public class UVController {

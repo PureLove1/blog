@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.blog.common.Result;
 import com.blog.pojo.Tag;
 import com.blog.service.TagService;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
  * @author 贺畅
  * @date 2023/6/21
  */
+@Api("标签管理")
 @RestController
 @RequestMapping("/tag")
 public class TagController {
