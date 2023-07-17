@@ -63,19 +63,23 @@
             <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %level [%thread] %logger{10} [%file:%line] %msg%n</pattern>
             <charset>utf-8</charset>
         </encoder>
+        <!--日志级别过滤器，匹配时接收，不匹配时拒绝-->
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>error</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
     </appender>
 
     <!--DEBUG级别日志太低了，东西很杂-->
-<!--    <root level="DEBUG">-->
-<!--        <appender-ref ref="STDOUT"/>-->
-<!--    </root>-->
     <root level="INFO">
         <appender-ref ref="STDOUT"/>
         <appender-ref ref="FILE_INFO"/>
-    </root>
-    <root level="ERROR">
         <appender-ref ref="FILE_ERROR"/>
     </root>
+<!--    <root level="ERROR">-->
+<!--        <appender-ref ref="FILE_ERROR"/>-->
+<!--    </root>-->
 <!--    <root level="ERROR">-->
 <!--        <appender-ref ref="FILE_INFO"/>-->
 <!--        <appender-ref ref="STDOUT"/>-->
