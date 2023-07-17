@@ -6,6 +6,7 @@ import com.blog.common.UserHolder;
 import com.blog.pojo.FastDFSFile;
 import com.blog.pojo.User;
 import com.blog.util.FastDfsClient;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,10 +50,10 @@ public class FileController {
     }
     /**
      * 返回 图片的全路径
-     *
      * @param file 页面的文件对象
      * @return
      */
+    @ApiOperation("上传博文图片")
     @PostMapping
     @HasAnyRole(ROLE_VIP)
     public Result upload(@RequestParam(value = "file") MultipartFile file) {
@@ -89,6 +90,7 @@ public class FileController {
         return Result.error("文件上传过程中出错！",SYSTEM_EXECUTION_ERROR);
     }
 
+    @ApiOperation("删除博文图片")
     @DeleteMapping
     public Result deleteFile(@RequestParam String url){
         User currentUser = UserHolder.getCurrentUser();

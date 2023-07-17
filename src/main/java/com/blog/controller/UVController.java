@@ -3,6 +3,7 @@ package com.blog.controller;
 import com.blog.common.Result;
 import com.blog.constant.StatusCode;
 import com.blog.service.UniqueVisitorService;
+import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +36,7 @@ public class UVController {
 	 * @param date
 	 * @return
 	 */
+	@ApiOperation("获取单日UV")
 	@GetMapping
 	public Result getDateUV(@Param("date") @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss") Date date) {
 		if (date == null) {
@@ -52,6 +54,7 @@ public class UVController {
 	 * @param end
 	 * @return
 	 */
+	@ApiOperation("获取日期范围UV")
 	@GetMapping("/range")
 	public Result getRangeUV(@Param("start") Date start, @Param("end") Date end) {
 		if (start == null || end == null || end.before(start) || end.after(new Date())) {

@@ -6,20 +6,33 @@ package com.blog.util;
  */
 public class StringUtil {
 	/**
-	 * 判断是否为空串
+	 * 判断是否为Null或全为空格的字符串
+	 *
 	 * @param string
 	 * @return
 	 */
-	public static boolean isNotBlank(String string){
+	public static boolean isNotBlank(String string) {
 		return string != null && !"".equals(string.trim());
 	}
 
 	/**
 	 * 判断是否为Null
+	 *
 	 * @param string
 	 * @return
 	 */
-	public static boolean isNotNull(String string){
+	public static boolean isNotNull(String string) {
 		return string != null;
 	}
+
+	/**
+	 * 判断字符串是否为空
+	 *
+	 * @param string
+	 * @return
+	 */
+	public static boolean isNotEmpty(String string) {
+		return string != null && string.length() != 0;
+	}
+
 }

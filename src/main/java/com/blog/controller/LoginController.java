@@ -9,6 +9,7 @@ import com.blog.pojo.TokenVO;
 import com.blog.pojo.User;
 import com.blog.service.UserService;
 import com.blog.util.JwtTokenUtil;
+import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,6 +69,7 @@ public class LoginController {
 	private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
 
 
+	@ApiOperation("登录并生成token")
 	@PostMapping
 	public Result login(HttpServletRequest request) {
 		String email = request.getParameter("email");
@@ -98,6 +100,7 @@ public class LoginController {
 	 * @return
 	 * @throws MessagingException
 	 */
+	@ApiOperation("获取邮箱验证码")
 	@PostMapping("/getEmailCode")
 	public Result getEmailCode(ServletRequest servletRequest)
 			throws CustomException, MessagingException {

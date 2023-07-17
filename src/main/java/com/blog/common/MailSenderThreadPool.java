@@ -18,7 +18,6 @@ public class MailSenderThreadPool {
 	private static final Logger logger = LoggerFactory.getLogger(MailSenderThreadPool.class);
 
 	private static ThreadPoolExecutor mailSenderExecutor;
-
 	static {
 		//初始化线程池，
 		//ArrayBlockingQueue是带有任务缓冲的，容量至少为1，

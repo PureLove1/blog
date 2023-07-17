@@ -9,6 +9,9 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**
  * @author PureLove1
+ * EnableAsync注解开启异步调用
+ * MapperScan注解mapper接口扫描
+ * EnableTransactionManagement注解开启事务
  */
 @EnableAsync
 @SpringBootApplication

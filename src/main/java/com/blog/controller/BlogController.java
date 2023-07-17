@@ -5,6 +5,7 @@ import com.blog.common.Result;
 import com.blog.pojo.Blog;
 import com.blog.service.BlogService;
 import com.blog.util.StringUtil;
+import io.swagger.annotations.ApiOperation;
 import org.apache.ibatis.annotations.Param;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,11 +53,10 @@ public class BlogController {
 	private static final Logger logger = LoggerFactory.getLogger(BlogController.class);
 
 	/**
-	 * 博文发布
-	 *
 	 * @param blog
 	 * @return
 	 */
+	@ApiOperation("博文发布")
 	@PostMapping
 	@HasAnyRole(ROLE_VIP)
 	public Result addBlog(@RequestBody Blog blog) {
@@ -68,11 +68,10 @@ public class BlogController {
 	}
 
 	/**
-	 * 修改博客内容
-	 *
 	 * @param blog
 	 * @return
 	 */
+	@ApiOperation("更新博文")
 	@PutMapping
 	@HasAnyRole(ROLE_VIP)
 	public Result updateBlog(@RequestBody Blog blog) {
@@ -83,13 +82,12 @@ public class BlogController {
 	}
 
 	/**
-	 * 博文列表分页查询
-	 *
 	 * @param pageSize
 	 * @param currentPage
 	 * @param startTime
 	 * @return
 	 */
+	@ApiOperation("获取博文列表分页")
 	@GetMapping
 	public Result getBlogList(@Param("pageSize") Long pageSize,
 	                          @Param("currentPage") Long currentPage,
@@ -102,11 +100,10 @@ public class BlogController {
 	}
 
 	/**
-	 * 根据id查询博文
-	 *
 	 * @param id
 	 * @return
 	 */
+	@ApiOperation("根据id查询博文")
 	@GetMapping("/{id}")
 	public Result getBlogById(@PathVariable String id) {
 		if (id == null) {
@@ -125,7 +122,6 @@ public class BlogController {
 
 	/**
 	 * 用于判断博文对象是否为null
-	 *
 	 * @param blog
 	 * @return
 	 */
@@ -145,13 +141,12 @@ public class BlogController {
 	}
 
 	/**
-	 * 根据标签分页查询
-	 *
 	 * @param tag
 	 * @param pageSize
 	 * @param currentPage
 	 * @return
 	 */
+	@ApiOperation("根据标签分页查询博文")
 	@GetMapping("/tag")
 	public Result getBlogByTag(@Param("tag") String tag, @Param("pageSize") Integer pageSize,
 	                           @Param("currentPage") Integer currentPage) {
@@ -165,13 +160,12 @@ public class BlogController {
 	}
 
 	/**
-	 * 根据标题分页查询
-	 *
 	 * @param title
 	 * @param pageSize
 	 * @param currentPage
 	 * @return
 	 */
+	@ApiOperation("根据标题分页查询博文")
 	@GetMapping("/title")
 	public Result getBlogByTitle(@Param("title") String title, @Param("pageSize") Integer pageSize,
 	                             @Param("currentPage") Integer currentPage) {
@@ -185,11 +179,10 @@ public class BlogController {
 	}
 
 	/**
-	 * 查询最新博文列表
-	 *
 	 * @param pageSize
 	 * @return
 	 */
+	@ApiOperation("查询最新博文标题")
 	@GetMapping("/newest")
 	public Result getNewestTitle(@Param("pageSize") Integer pageSize) {
 		if (pageSize < MIN_PAGE_SIZE) {
@@ -201,6 +194,13 @@ public class BlogController {
 		return blogService.getNewestTitle(pageSize);
 	}
 
+	/**
+	 * @param blogId
+	 * @param pageSize
+	 * @param currentPage
+	 * @return
+	 */
+	@ApiOperation("根据合集分页查询博文")
 	@GetMapping("/collection")
 	public Result getBlogListByCollection(@Param("blogId") Long blogId, @Param("pageSize") Integer pageSize,
 	                                      @Param("currentPage") Integer currentPage) {

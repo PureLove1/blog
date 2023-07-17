@@ -40,7 +40,6 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
 
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-		System.out.println("授权拦截");
 		// 资源请求直接放行
 		if (!(handler instanceof HandlerMethod)) {
 			return true;

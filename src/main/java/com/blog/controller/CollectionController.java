@@ -3,6 +3,7 @@ package com.blog.controller;
 import com.blog.annotation.HasAnyRole;
 import com.blog.common.Result;
 import com.blog.service.CollectionService;
+import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,7 @@ public class CollectionController {
 	@Autowired
 	private CollectionService collectionService;
 
+	@ApiOperation("查询用户创建的全部合集")
 	@GetMapping
 	@HasAnyRole(ROLE_VIP)
 	public Result listAll(){

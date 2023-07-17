@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.blog.common.Result;
 import com.blog.pojo.Tag;
 import com.blog.service.TagService;
+import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,7 @@ public class TagController {
 	@Autowired
 	private TagService tagService;
 
+	@ApiOperation("查询创建的全部标签")
 	@GetMapping
 	public Result listAll(){
 		return Result.ok(tagService.list());
@@ -31,6 +33,7 @@ public class TagController {
 	 * @param tag
 	 * @return
 	 */
+	@ApiOperation("创建标签")
 	@PostMapping
 	public Result addTag(@RequestBody Tag tag){
 		int count = tagService.count(new LambdaQueryWrapper<Tag>().eq(Tag::getContent, tag.getContent()));
