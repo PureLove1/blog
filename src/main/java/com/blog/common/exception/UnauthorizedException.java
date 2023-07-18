@@ -8,7 +8,10 @@ import lombok.Getter;
  * @date 2022/12/22
  */
 @Getter
-@AllArgsConstructor
 public class UnauthorizedException extends RuntimeException {
 	private String message;
+
+	public UnauthorizedException(String message) {
+		super(message);
+	}
 }

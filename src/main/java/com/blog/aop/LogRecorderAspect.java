@@ -37,6 +37,11 @@ import static com.blog.util.StringUtil.isNotEmpty;
 @Component
 public class LogRecorderAspect {
 
+	/**
+	 * 允许的最大请求处理时间
+	 */
+	private static final int ALLOWED_MAX_PROCESS_TIME = 1000;
+
 	private static final Logger logger = LoggerFactory.getLogger(LogRecorderAspect.class);
 
 	/**
@@ -49,6 +54,7 @@ public class LogRecorderAspect {
 
 	/**
 	 * 记录用户controller访问信息
+	 *
 	 * @param joinPoint
 	 * @return
 	 */
@@ -76,12 +82,18 @@ public class LogRecorderAspect {
 		webLog.setMethod(request.getMethod());
 		webLog.setParameter(getParameter(method, joinPoint.getArgs()));
 		webLog.setResult(result);
-		webLog.setSpendTime((int) (endTime - startTime));
+		int spendTime = (int) (endTime - startTime);
+		webLog.setSpendTime(spendTime);
 		webLog.setStartTime(startTime);
 		webLog.setUri(request.getRequestURI());
 		webLog.setUrl(request.getRequestURL().toString());
 		//对象用于后续logstash收集使用
-        logger.info("{}", webLog.getLogString());
+		if (spendTime < ALLOWED_MAX_PROCESS_TIME) {
+			logger.info("{}", webLog.getLogString());
+		}else{
+			logger.warn("{}", webLog.getLogString());
+		}
+
 		return result;
 	}
 
@@ -105,7 +117,7 @@ public class LogRecorderAspect {
 				if (!isNotEmpty(requestParam.value())) {
 					key = requestParam.value();
 				}
-				if(args[i]!=null){
+				if (args[i] != null) {
 					map.put(key, args[i]);
 					argList.add(map);
 				}

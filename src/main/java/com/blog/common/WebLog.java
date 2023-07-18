@@ -2,6 +2,9 @@ package com.blog.common;
 
 import lombok.Data;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 /**
  * @Author PureLove1
  * @Date 2023/7/17
@@ -60,9 +63,10 @@ public class WebLog {
 
 
 	public String getLogString() {
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy年MM月dd日HH时mm分ss秒");
 		return "用户-" + username + '\'' +
 				",IP-" + ip + '\'' +
-				"于" + startTime + '\'' +
+				"于" + sdf.format(new Date(startTime)) + '\'' +
 				"执行了" + description + "操作" + '\'' +
 				",请求URL-" + url + '\'' +
 				",请求URI-" + uri + '\'' +
