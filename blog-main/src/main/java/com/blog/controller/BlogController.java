@@ -7,7 +7,6 @@ import com.blog.service.BlogService;
 import com.blog.util.StringUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.apache.ibatis.annotations.Param;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -94,9 +93,9 @@ public class BlogController {
 	 */
 	@ApiOperation("获取博文列表分页")
 	@GetMapping
-	public Result getBlogList(@Param("pageSize") Long pageSize,
-	                          @Param("currentPage") Long currentPage,
-	                          @Param("startTime") String startTime) {
+	public Result getBlogList(@RequestParam("pageSize") Long pageSize,
+	                          @RequestParam("currentPage") Long currentPage,
+	                          @RequestParam("startTime") String startTime) {
 		if (pageSize == null || pageSize < MIN_PAGE_SIZE || currentPage == null || currentPage < MIN_PAGE || startTime == null) {
 			return Result.error("错误的分页参数");
 		}
@@ -134,8 +133,8 @@ public class BlogController {
 	 */
 	@ApiOperation("根据标签分页查询博文")
 	@GetMapping("/tag")
-	public Result getBlogByTag(@Param("tag") String tag, @Param("pageSize") Integer pageSize,
-	                           @Param("currentPage") Integer currentPage) {
+	public Result getBlogByTag(@RequestParam("tag") String tag, @RequestParam("pageSize") Integer pageSize,
+	                           @RequestParam("currentPage") Integer currentPage) {
 		if (!StringUtil.isNotBlank(tag)) {
 			return Result.error("错误的参数");
 		}
@@ -153,8 +152,8 @@ public class BlogController {
 	 */
 	@ApiOperation("根据标题分页查询博文")
 	@GetMapping("/title")
-	public Result getBlogByTitle(@Param("title") String title, @Param("pageSize") Integer pageSize,
-	                             @Param("currentPage") Integer currentPage) {
+	public Result getBlogByTitle(@RequestParam("title") String title, @RequestParam("pageSize") Integer pageSize,
+	                             @RequestParam("currentPage") Integer currentPage) {
 		if (!StringUtil.isNotBlank(title)) {
 			return Result.error("错误的参数");
 		}
@@ -170,7 +169,7 @@ public class BlogController {
 	 */
 	@ApiOperation("查询最新博文标题")
 	@GetMapping("/newest")
-	public Result getNewestTitle(@Param("pageSize") Integer pageSize) {
+	public Result getNewestTitle(@RequestParam("pageSize") Integer pageSize) {
 		if (pageSize < MIN_PAGE_SIZE) {
 			return Result.error("错误的分页大小");
 		} else if (pageSize > MAX_PAGE_SIZE) {
@@ -188,8 +187,8 @@ public class BlogController {
 	 */
 	@ApiOperation("根据合集分页查询博文")
 	@GetMapping("/collection")
-	public Result getBlogListByCollection(@Param("blogId") Long blogId, @Param("pageSize") Integer pageSize,
-	                                      @Param("currentPage") Integer currentPage) {
+	public Result getBlogListByCollection(@RequestParam("blogId") Long blogId, @RequestParam("pageSize") Integer pageSize,
+	                                      @RequestParam("currentPage") Integer currentPage) {
 		if (pageSize == null || pageSize < MIN_PAGE_SIZE || currentPage == null || currentPage < MIN_PAGE) {
 			return Result.error("错误的分页参数");
 		}

@@ -7,10 +7,10 @@ import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.query.Param;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Date;
@@ -39,7 +39,7 @@ public class UVController {
 	 */
 	@ApiOperation("获取单日UV")
 	@GetMapping
-	public Result getDateUV(@Param("date") @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss") Date date) {
+	public Result getDateUV(@RequestParam("date") @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss") Date date) {
 		if (date == null) {
 			return Result.error("必填参数不得为空", USER_REQUIRED_PARAMETER_IS_NULL_ERROR);
 		}
@@ -57,7 +57,7 @@ public class UVController {
 	 */
 	@ApiOperation("获取日期范围UV")
 	@GetMapping("/range")
-	public Result getRangeUV(@Param("start") Date start, @Param("end") Date end) {
+	public Result getRangeUV(@RequestParam("start") Date start, @RequestParam("end") Date end) {
 		if (start == null || end == null || end.before(start) || end.after(new Date())) {
 			return Result.error("非法的参数", USER_WRONG_PARAMETER_ERROR);
 		}

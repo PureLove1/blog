@@ -73,7 +73,7 @@
     </appender>
 
     <!--root只能有一个，日志级别有TRACE DEBUG INFO ARN ERROR ALL OFF，默认为DEBUG-->
-    <root level="OFF">
+    <root level="INFO">
         <appender-ref ref="STDOUT"/>
         <appender-ref ref="FILE_INFO"/>
         <appender-ref ref="FILE_ERROR"/>

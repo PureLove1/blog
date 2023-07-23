@@ -4,6 +4,7 @@ import lombok.Data;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @Author PureLove1
@@ -54,7 +55,7 @@ public class WebLog {
 	/**
 	 * 请求参数
 	 */
-	private Object parameter;
+	private List<Object> parameter;
 
 	/**
 	 * 返回结果

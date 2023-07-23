@@ -1,5 +1,6 @@
 package com.blog.aop;
 
+import com.blog.common.Result;
 import com.blog.common.WebLog;
 import com.blog.util.IPUtil;
 import io.swagger.annotations.ApiOperation;
@@ -25,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.blog.constant.StatusCode.OK;
 import static com.blog.util.StringUtil.isNotEmpty;
 
 /**
@@ -39,6 +41,8 @@ public class LogRecorderAspect {
 	 * 允许的最大请求处理时间
 	 */
 	private static final int ALLOWED_MAX_PROCESS_TIME = 1000;
+
+	private static final String RESULT_OK = "OK";
 
 	private static final Logger logger = LoggerFactory.getLogger(LogRecorderAspect.class);
 
@@ -79,7 +83,9 @@ public class LogRecorderAspect {
 		webLog.setIp(IPUtil.getRemoteAddr(request));
 		webLog.setMethod(request.getMethod());
 		webLog.setParameter(getParameter(method, joinPoint.getArgs()));
-		webLog.setResult(result);
+		Result resultObj = (Result) result;
+		String statusCode = resultObj.getStatusCode();
+		webLog.setResult(OK.equals(statusCode) ? RESULT_OK : result);
 		int spendTime = (int) (endTime - startTime);
 		webLog.setSpendTime(spendTime);
 		webLog.setStartTime(startTime);
@@ -88,17 +94,16 @@ public class LogRecorderAspect {
 		//对象用于后续logstash收集使用
 		if (spendTime < ALLOWED_MAX_PROCESS_TIME) {
 			logger.info("{}", webLog.getLogString());
-		}else{
+		} else {
 			logger.warn("{}", webLog.getLogString());
 		}
-
 		return result;
 	}
 
 	/**
 	 * 根据方法和传入的参数获取请求参数
 	 */
-	private Object getParameter(Method method, Object[] args) {
+	private List<Object> getParameter(Method method, Object[] args) {
 		List<Object> argList = new ArrayList<>();
 		Parameter[] parameters = method.getParameters();
 		for (int i = 0; i < parameters.length; i++) {
@@ -123,8 +128,6 @@ public class LogRecorderAspect {
 		}
 		if (argList.size() == 0) {
 			return null;
-		} else if (argList.size() == 1) {
-			return argList.get(0);
 		} else {
 			return argList;
 		}
