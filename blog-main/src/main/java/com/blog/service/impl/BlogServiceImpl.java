@@ -13,6 +13,10 @@ import com.blog.pojo.*;
 import com.blog.service.BlogService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.core.ReturnedMessage;
+import org.springframework.amqp.rabbit.connection.CorrelationData;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -20,12 +24,16 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+import static com.blog.config.RabbitConfig.CACHE_DIRECT_EXCHANGE;
+import static com.blog.config.RabbitConfig.ROUTING_KEY;
 import static com.blog.constant.RedisKeyPrefix.BLOG_CACHE;
 
 /**
@@ -43,7 +51,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog>
 	 */
 	@Autowired
 	@Lazy
-	private BlogService  blogService;
+	private BlogService blogService;
 
 	@Autowired
 	private CollectionMapper collectionMapper;
@@ -65,6 +73,9 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog>
 
 	@Autowired
 	private UserMapper userMapper;
+
+	@Autowired
+	private RabbitTemplate rabbitTemplate;
 
 	/**
 	 * 博客发布
@@ -246,6 +257,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog>
 
 	/**
 	 * 根据合集查询博客列表
+	 *
 	 * @param blogId
 	 * @param pageSize
 	 * @param currentPage
@@ -394,11 +406,22 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog>
 		if (!updateById(blog)) {
 			throw new CustomException("更新博客失败");
 		}
+
 		blog.setUserId(user.getId());
 		blog.setUserName(user.getUserName());
 		Blog one = getOne(new LambdaQueryWrapper<Blog>().eq(Blog::getId, blog.getId()).select(Blog::getCreateTime));
 		blog.setCreateTime(one.getCreateTime());
-		redisTemplate.opsForValue().set(BLOG_CACHE + id,blog, 30, TimeUnit.MINUTES);
+		//默认发送消息就是持久化的
+		CorrelationData correlationData = new CorrelationData(UUID.randomUUID().toString());
+		//返回中携带业务数据
+		correlationData.setReturned(new ReturnedMessage(
+				new Message(blog.toString()
+						.getBytes(StandardCharsets.UTF_8)),
+				0,
+				"000000",
+				CACHE_DIRECT_EXCHANGE,
+				ROUTING_KEY));
+		rabbitTemplate.convertAndSend(CACHE_DIRECT_EXCHANGE, ROUTING_KEY, blog, correlationData);
 		return Result.ok("发布成功", id);
 	}
 
@@ -541,6 +564,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog>
 
 	/**
 	 * 异步修改浏览量
+	 *
 	 * @param id
 	 */
 	@Override

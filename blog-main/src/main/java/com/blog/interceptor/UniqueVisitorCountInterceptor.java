@@ -1,6 +1,7 @@
 package com.blog.interceptor;
 
 import com.blog.service.UniqueVisitorService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -16,6 +17,7 @@ import static com.blog.util.IPUtil.getRemoteAddr;
  * UV统计拦截
  */
 @Component
+@Slf4j
 public class UniqueVisitorCountInterceptor implements HandlerInterceptor {
 
 	@Autowired

@@ -1,12 +1,12 @@
 package com.blog;
 
 import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
-import org.springframework.web.servlet.DispatcherServlet;
 
 /**
  * @author PureLove1
@@ -22,9 +22,7 @@ public class BlogApplication {
 
 	public static void main(String[] args) {
 		ConfigurableApplicationContext run = SpringApplication.run(BlogApplication.class, args);
-		DispatcherServlet bean = run.getBean(DispatcherServlet.class);
-		DispatcherServlet bean1 = run.getBean(DispatcherServlet.class);
-		System.out.println(bean1==bean);
+		ConnectionFactory bean = run.getBean(ConnectionFactory.class);
 	}
 
 }

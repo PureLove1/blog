@@ -1,7 +1,9 @@
 package com.blog.aop;
 
 import com.blog.common.Result;
+import com.blog.common.UserHolder;
 import com.blog.common.WebLog;
+import com.blog.pojo.User;
 import com.blog.util.IPUtil;
 import io.swagger.annotations.ApiOperation;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -79,7 +81,12 @@ public class LogRecorderAspect {
 		}
 		long endTime = System.currentTimeMillis();
 		//设置日志信息
-		webLog.setUsername(request.getRemoteUser());
+		User currentUser = UserHolder.getCurrentUser();
+		if (currentUser == null) {
+			webLog.setUsername("远程用户名--" + request.getRemoteUser());
+		} else {
+			webLog.setUsername("用户ID--" + currentUser.getId() + "远程用户名--" + request.getRemoteUser());
+		}
 		webLog.setIp(IPUtil.getRemoteAddr(request));
 		webLog.setMethod(request.getMethod());
 		webLog.setParameter(getParameter(method, joinPoint.getArgs()));
